@@ -23,7 +23,5 @@ class m231128_184759_create_table_tbl_region extends Migration
     public function safeDown()
     {
         $this->dropTable($this->_table);
-        //echo "m231128_184759_create_table_tbl_region cannot be reverted.\n";
-        //return false;
     }
 }

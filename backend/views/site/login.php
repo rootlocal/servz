@@ -1,32 +1,73 @@
 <?php
 
-/** @var yii\web\View $this */
-/** @var yii\bootstrap5\ActiveForm $form */
-/** @var \common\models\LoginForm $model */
+use backend\assets\AppAsset;
+use backend\assets\FontAwesomeAsset;
+use common\models\forms\LoginForm;
+use yii\bootstrap4\ActiveForm;
+use yii\helpers\Html;
+use yii\web\View;
 
-use yii\bootstrap5\ActiveForm;
-use yii\bootstrap5\Html;
+/**
+ * @var View $this
+ * @var ActiveForm $form
+ * @var LoginForm $model
+ */
 
-$this->title = 'Login';
+AppAsset::register($this);
+FontAwesomeAsset::register($this);
 ?>
-<div class="site-login">
-    <div class="mt-5 offset-lg-3 col-lg-6">
-        <h1><?= Html::encode($this->title) ?></h1>
 
-        <p>Please fill out the following fields to login:</p>
+<div class="login-page">
 
-        <?php $form = ActiveForm::begin(['id' => 'login-form']); ?>
+    <h1 class="login-box-msg text-center"><?= Yii::t('app', 'Sign in to start your session') ?></h1>
 
-            <?= $form->field($model, 'username')->textInput(['autofocus' => true]) ?>
+    <div class="card">
+        <div class="card-body login-card-body">
+            <?php $form = ActiveForm::begin(['id' => 'login-form']) ?>
 
-            <?= $form->field($model, 'password')->passwordInput() ?>
+            <?= $form->errorSummary($model) ?>
 
-            <?= $form->field($model, 'rememberMe')->checkbox() ?>
+            <?= $form->field($model, 'username', [
+                'options' => ['class' => 'form-group has-feedback'],
+                'inputTemplate' => '{input}<div class="input-group-append"><div class="input-group-text"><span class="fas fa-user"></span></div></div>',
+                'template' => '{beginWrapper}{input}{error}{endWrapper}<div class="small">{hint}</div>',
+                'wrapperOptions' => ['class' => 'input-group mb-3']
+            ])
+                ->label(false)
+                ->textInput(['placeholder' => $model->getAttributeLabel('username')])
+                ->hint($model->getAttributeHint('username'))
+            ?>
 
-            <div class="form-group">
-                <?= Html::submitButton('Login', ['class' => 'btn btn-primary btn-block', 'name' => 'login-button']) ?>
+            <?= $form->field($model, 'password', [
+                'options' => ['class' => 'form-group has-feedback'],
+                'inputTemplate' => '{input}<div class="input-group-append"><div class="input-group-text"><span class="fas fa-lock"></span></div></div>',
+                'template' => '{beginWrapper}{input}{error}{endWrapper}<div class="small">{hint}</div>',
+                'wrapperOptions' => ['class' => 'input-group mb-3']
+            ])
+                ->label(false)
+                ->passwordInput(['placeholder' => $model->getAttributeLabel('password')])
+                ->hint($model->getAttributeHint('password'))
+            ?>
+
+            <?= $form->field($model, 'rememberMe')->checkbox(['uncheck' => null]) ?>
+
+            <div class="btn-group">
+                <?= Html::submitButton('Sign In', ['class' => 'btn btn-primary btn-block']) ?>
             </div>
 
-        <?php ActiveForm::end(); ?>
+
+            <?php ActiveForm::end(); ?>
+
+            <!-- /.social-auth-links -->
+
+            <!--<p class="mb-1">
+                <a href="#">I forgot my password</a>
+            </p>
+            <p class="mb-0">
+                <a href="#" class="text-center">Register a new membership</a>
+            </p>-->
+        </div>
+        <!-- /.login-card-body -->
     </div>
 </div>
+
