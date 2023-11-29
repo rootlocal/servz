@@ -18,7 +18,9 @@ create user spring with password 'spring';
 create database servizoria owner spring;
 ~~~
 
-### в файле common/config/mail-local.php: указать созданную БД имя пользователя и пароль
+### в файле [common/config/main-local.php](common/config/main-local.php)
+
+указать созданную БД имя пользователя и пароль
 
 ~~~php
 'db' => [
