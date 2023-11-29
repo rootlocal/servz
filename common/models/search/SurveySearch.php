@@ -164,7 +164,7 @@ class SurveySearch extends Survey
         }
 
         if (!empty($this->search)) {
-            $expression = new Expression('survey.name || survey.phone || survey.email || survey.name || region.name');
+            $expression = new Expression('survey.name || survey.phone || survey.email || city.name || region.name');
             $query->andWhere(['ilike', $expression, '%' . $this->search . '%', false]);
         }
 
