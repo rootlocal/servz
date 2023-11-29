@@ -54,6 +54,14 @@ make serve-backend
 пользователь admin
 пароль admin
 
+## если разварачивать с дампа.
+
+дамп лежит в папке [data/servizoria.sql](data/servizoria.sql)
+
+~~~shell
+cat data/servizoria.sql | psql servizoria
+~~~
+
 ### Используемые версии в проекте ПО и их зависимости:
 
 * php - 8.2
