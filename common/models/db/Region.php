@@ -83,7 +83,9 @@ class Region extends ActiveRecord
     public static function getItems(): array
     {
         if (empty(self::$_items)) {
-            $query = self::find()->select(['id', 'name'])->asArray()->all();
+            $query = self::find()->select(['id', 'name'])
+                ->orderBy([self::tableName() . '.name' => SORT_ASC])
+                ->asArray()->all();
             self::$_items = ArrayHelper::map($query, 'id', 'name');
         }
 

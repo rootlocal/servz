@@ -6,6 +6,7 @@ use frontend\models\SurveyForm;
 use yii\web\View;
 use yii\bootstrap5\ActiveForm;
 use yii\bootstrap5\Html;
+use yii\widgets\MaskedInput;
 
 /**
  * @var View $this
@@ -18,7 +19,10 @@ use yii\bootstrap5\Html;
     <?php $form = ActiveForm::begin(); ?>
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'phone')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'phone')->widget(MaskedInput::class, [
+    'mask' => '+7(999)-999-99-99'
+    ]) ?>
+
     <?= $form->field($model, 'city_id')->dropDownList(City::getItems(), [
         'prompt' => Yii::t('app', 'Select...'),
     ]) ?>

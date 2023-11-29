@@ -12,6 +12,7 @@ use yii\db\ActiveQuery;
 class SurveySearch extends Survey
 {
     public $region_id;
+    public $search;
 
     private ?ActiveQuery $_query = null;
 
@@ -20,7 +21,7 @@ class SurveySearch extends Survey
     {
         return [
             [['id', 'city_id', 'gender', 'region_id', 'rating'], 'integer'],
-            [['name', 'email', 'phone', 'created_at', 'updated_at'], 'string', 'max' => 255],
+            [['name', 'email', 'phone', 'created_at', 'updated_at', 'search'], 'string', 'max' => 255],
         ];
     }
 
@@ -100,6 +101,12 @@ class SurveySearch extends Survey
                     'desc' => [self::tableName() . '.updated_at' => SORT_DESC],
                     'default' => SORT_ASC,
                 ],
+
+                'gender' => [
+                    'asc' => [self::tableName() . '.gender' => SORT_ASC],
+                    'desc' => [self::tableName() . '.gender' => SORT_DESC],
+                    'default' => SORT_ASC,
+                ],
             ]
         ]);
 
@@ -116,26 +123,24 @@ class SurveySearch extends Survey
         }
 
         $query->andFilterWhere([
-            'id' => $this->id,
-            'city_id' => $this->city_id,
-            'gender' => $this->gender,
-            'rating' => $this->rating,
+            self::tableName() . '.gender' => $this->gender,
+            self::tableName() . '.rating' => $this->rating,
         ]);
 
-        $query->andFilterWhere(['ilike', 'name', $this->name])
-            ->andFilterWhere(['ilike', 'email', $this->email])
-            ->andFilterWhere(['ilike', 'phone', $this->phone]);
+        $query->andFilterWhere(['ilike', self::tableName() . '.name', $this->name])
+            ->andFilterWhere(['ilike', self::tableName() . '.email', $this->email])
+            ->andFilterWhere(['ilike', self::tableName() . '.phone', $this->phone]);
 
         if (!empty($this->created_at)) {
             $start = strtotime($this->created_at . ' 00:00:01');
             $stop = strtotime($this->created_at . ' 23:59:59');
 
             if ($start !== false) {
-                $query->andFilterWhere(['>=', self::tableName() . '.created_at', $start]);
+                $query->andWhere(['>=', self::tableName() . '.created_at', $start]);
             }
 
             if ($stop !== false) {
-                $query->andFilterWhere(['<=', self::tableName() . '.created_at', $stop]);
+                $query->andWhere(['<=', self::tableName() . '.created_at', $stop]);
             }
         }
 
@@ -144,16 +149,26 @@ class SurveySearch extends Survey
             $stop = strtotime($this->updated_at . ' 23:59:59');
 
             if ($start !== false) {
-                $query->andFilterWhere(['>=', self::tableName() . '.updated_at', $start]);
+                $query->andWhere(['>=', self::tableName() . '.updated_at', $start]);
             }
 
             if ($stop !== false) {
-                $query->andFilterWhere(['<=', self::tableName() . '.updated_at', $stop]);
+                $query->andWhere(['<=', self::tableName() . '.updated_at', $stop]);
             }
         }
 
         if (!empty($this->region_id)) {
-            $query->andWhere(['city.region_id' => $this->region_id]);
+            $query->andWhere(['region.id' => $this->region_id]);
+        }
+
+        if (!empty($this->search)) {
+            $query->andWhere(['ilike', self::tableName() . '.name || '
+                . self::tableName() . '.phone || '
+                . self::tableName() . '.email || '
+                . 'city.name ||'
+                . 'region.name',
+                '%' . $this->search . '%',
+                false]);
         }
 
 
@@ -163,10 +178,9 @@ class SurveySearch extends Survey
     public function getQuery(): ActiveQuery
     {
         if ($this->_query === null) {
-            $this->_query = Survey::find();
-            $this->_query
-                ->leftJoin(City::tableName(), 'city.id = survey.id')
-                ->leftJoin(Region::tableName(), 'region.id = city.id');
+            $this->_query = Survey::find()
+                ->leftJoin(City::tableName() . ' as city', 'city.id = survey.city_id')
+                ->leftJoin(Region::tableName() . ' as region', 'region.id = city.region_id');
         }
 
         return $this->_query;

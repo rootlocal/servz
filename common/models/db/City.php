@@ -38,7 +38,7 @@ class City extends ActiveRecord
             [['region_id'], 'default', 'value' => null],
             [['region_id'], 'integer'],
             [['name'], 'string', 'max' => 255],
-            [['name'], 'unique'],
+            [['name', 'region_id'], 'unique', 'targetAttribute' => ['name', 'region_id']],
             [['region_id'], 'exist', 'skipOnError' => true, 'targetClass' => Region::class, 'targetAttribute' => ['region_id' => 'id']],
         ];
     }
@@ -88,11 +88,17 @@ class City extends ActiveRecord
     public static function getItems(): array
     {
         if (empty(self::$_items)) {
-            $query = self::find()->joinWith('region')->select(
-                new Expression("city.id as key, concat(city.name, ' (', region.name, ')') as full_name")
-            )->asArray()->all();
+            $query = self::find()
+                ->alias('city')
+                ->joinWith('region as region')->select(
+                    new Expression("city.id as key, concat(city.name, ' (', region.name, ')') as value")
+                )->orderBy([
+                    self::tableName() . '.name' => SORT_ASC,
+                    Region::tableName() . '.name' => SORT_ASC,
+                ])
+                ->asArray()->all();
 
-            self::$_items = ArrayHelper::map($query, 'key', 'full_name');
+            self::$_items = ArrayHelper::map($query, 'key', 'value');
         }
 
         return self::$_items;

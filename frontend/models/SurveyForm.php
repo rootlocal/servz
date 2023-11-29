@@ -25,11 +25,12 @@ class SurveyForm extends Model
             [['name', 'email', 'phone', 'comment'], 'trim'],
             [['name', 'email', 'phone', 'city_id', 'rating', 'gender', 'comment'], 'required'],
             [['city_id', 'gender'], 'default', 'value' => null],
-            [['city_id', 'gender', 'rating'], 'integer'],
+            [['city_id', 'gender'], 'integer'],
             [['name', 'email', 'phone'], 'string', 'max' => 255],
             [['email'], 'email'],
             [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => City::class, 'targetAttribute' => ['city_id' => 'id']],
             [['comment'], 'safe'],
+            [['rating'], 'integer', 'min' => 1, 'max' => 10],
         ];
     }
 
@@ -56,6 +57,7 @@ class SurveyForm extends Model
     public function sendForm(): bool
     {
         $model = new Survey();
+        $this->phone = preg_replace("/[^0-9]/", "", $this->phone);
         $model->setAttributes($this->getAttributes());
         return $model->save(false);
     }

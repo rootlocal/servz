@@ -16,13 +16,19 @@ $this->title = Yii::t('app', 'Surveys');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="survey-index">
-    <div class="form-group">
-        <?= Html::a(Yii::t('app', 'Create Survey'), ['create'], ['class' => 'btn btn-success']) ?>
+    <?php Pjax::begin(); ?>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="float-right">
+                <?= $this->render('search/_search', ['model' => $searchModel]) ?>
+            </div>
+        </div>
     </div>
 
-    <?php Pjax::begin(); ?>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
-    <?= $this->render('_grid', ['searchModel' => $searchModel, 'dataProvider' => $dataProvider]); ?>
+    <div class="table-responsive">
+        <?= $this->render('_grid', ['searchModel' => $searchModel, 'dataProvider' => $dataProvider]); ?>
+    </div>
     <?php Pjax::end(); ?>
 
 </div>
