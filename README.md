@@ -5,10 +5,12 @@
 * если нужно инициализировать проект в PROD окружении
    ~~~shell
    make init-prod
+   make composer-update-prod
    ~~~
 * если нужно инициализировать проект в DEV окружении
    ~~~shell
    make init-dev
+   make composer-update-dev
    ~~~
 
 ### создание пользователя и БД
