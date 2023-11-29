@@ -92,10 +92,8 @@ class City extends ActiveRecord
                 ->alias('city')
                 ->joinWith('region as region')->select(
                     new Expression("city.id as key, concat(city.name, ' (', region.name, ')') as value")
-                )->orderBy([
-                    self::tableName() . '.name' => SORT_ASC,
-                    Region::tableName() . '.name' => SORT_ASC,
-                ])
+                )
+                ->orderBy(['city.name' => SORT_ASC, 'region.name' => SORT_ASC,])
                 ->asArray()->all();
 
             self::$_items = ArrayHelper::map($query, 'key', 'value');

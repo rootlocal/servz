@@ -8,11 +8,12 @@ use common\models\db\Survey;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
+use yii\db\Expression;
 
 class SurveySearch extends Survey
 {
     public $region_id;
-    public $search;
+    public ?string $search = null;
 
     private ?ActiveQuery $_query = null;
 
@@ -49,26 +50,26 @@ class SurveySearch extends Survey
             'attributes' => [
 
                 'id' => [
-                    'asc' => [self::tableName() . '.id' => SORT_ASC],
-                    'desc' => [self::tableName() . '.id' => SORT_DESC],
+                    'asc' => ['survey.id' => SORT_ASC],
+                    'desc' => ['survey.id' => SORT_DESC],
                     'default' => SORT_ASC,
                 ],
 
                 'name' => [
-                    'asc' => [self::tableName() . '.name' => SORT_ASC],
-                    'desc' => [self::tableName() . '.name' => SORT_DESC],
+                    'asc' => ['survey.name' => SORT_ASC],
+                    'desc' => ['survey.name' => SORT_DESC],
                     'default' => SORT_ASC,
                 ],
 
                 'email' => [
-                    'asc' => [self::tableName() . '.email' => SORT_ASC],
-                    'desc' => [self::tableName() . '.email' => SORT_DESC],
+                    'asc' => ['survey.email' => SORT_ASC],
+                    'desc' => ['survey.email' => SORT_DESC],
                     'default' => SORT_ASC,
                 ],
 
                 'phone' => [
-                    'asc' => [self::tableName() . '.phone' => SORT_ASC],
-                    'desc' => [self::tableName() . '.phone' => SORT_DESC],
+                    'asc' => ['survey.phone' => SORT_ASC],
+                    'desc' => ['survey.phone' => SORT_DESC],
                     'default' => SORT_ASC,
                 ],
 
@@ -85,26 +86,26 @@ class SurveySearch extends Survey
                 ],
 
                 'rating' => [
-                    'asc' => [self::tableName() . '.rating' => SORT_ASC],
-                    'desc' => [self::tableName() . '.rating' => SORT_DESC],
+                    'asc' => ['survey.rating' => SORT_ASC],
+                    'desc' => ['survey.rating' => SORT_DESC],
                     'default' => SORT_ASC,
                 ],
 
                 'created_at' => [
-                    'asc' => [self::tableName() . '.created_at' => SORT_ASC],
-                    'desc' => [self::tableName() . '.created_at' => SORT_DESC],
+                    'asc' => ['survey.created_at' => SORT_ASC],
+                    'desc' => ['survey.created_at' => SORT_DESC],
                     'default' => SORT_ASC,
                 ],
 
                 'updated_at' => [
-                    'asc' => [self::tableName() . '.updated_at' => SORT_ASC],
-                    'desc' => [self::tableName() . '.updated_at' => SORT_DESC],
+                    'asc' => ['survey.updated_at' => SORT_ASC],
+                    'desc' => ['survey.updated_at' => SORT_DESC],
                     'default' => SORT_ASC,
                 ],
 
                 'gender' => [
-                    'asc' => [self::tableName() . '.gender' => SORT_ASC],
-                    'desc' => [self::tableName() . '.gender' => SORT_DESC],
+                    'asc' => ['survey.gender' => SORT_ASC],
+                    'desc' => ['survey.gender' => SORT_DESC],
                     'default' => SORT_ASC,
                 ],
             ]
@@ -123,25 +124,25 @@ class SurveySearch extends Survey
         }
 
         $query->andFilterWhere([
-            self::tableName() . '.city_id' => $this->city_id,
-            self::tableName() . '.gender' => $this->gender,
-            self::tableName() . '.rating' => $this->rating,
+            'survey.city_id' => $this->city_id,
+            'survey.gender' => $this->gender,
+            'survey.rating' => $this->rating,
         ]);
 
-        $query->andFilterWhere(['ilike', self::tableName() . '.name', $this->name])
-            ->andFilterWhere(['ilike', self::tableName() . '.email', $this->email])
-            ->andFilterWhere(['ilike', self::tableName() . '.phone', $this->phone]);
+        $query->andFilterWhere(['ilike', 'survey.name', $this->name])
+            ->andFilterWhere(['ilike', 'survey.email', $this->email])
+            ->andFilterWhere(['ilike', 'survey.phone', $this->phone]);
 
         if (!empty($this->created_at)) {
             $start = strtotime($this->created_at . ' 00:00:01');
             $stop = strtotime($this->created_at . ' 23:59:59');
 
             if ($start !== false) {
-                $query->andWhere(['>=', self::tableName() . '.created_at', $start]);
+                $query->andWhere(['>=', 'survey.created_at', $start]);
             }
 
             if ($stop !== false) {
-                $query->andWhere(['<=', self::tableName() . '.created_at', $stop]);
+                $query->andWhere(['<=', 'survey.created_at', $stop]);
             }
         }
 
@@ -150,11 +151,11 @@ class SurveySearch extends Survey
             $stop = strtotime($this->updated_at . ' 23:59:59');
 
             if ($start !== false) {
-                $query->andWhere(['>=', self::tableName() . '.updated_at', $start]);
+                $query->andWhere(['>=', 'survey.updated_at', $start]);
             }
 
             if ($stop !== false) {
-                $query->andWhere(['<=', self::tableName() . '.updated_at', $stop]);
+                $query->andWhere(['<=', 'survey.updated_at', $stop]);
             }
         }
 
@@ -163,13 +164,8 @@ class SurveySearch extends Survey
         }
 
         if (!empty($this->search)) {
-            $query->andWhere(['ilike', self::tableName() . '.name || '
-                . self::tableName() . '.phone || '
-                . self::tableName() . '.email || '
-                . 'city.name ||'
-                . 'region.name',
-                '%' . $this->search . '%',
-                false]);
+            $expression = new Expression('survey.name || survey.phone || survey.email || survey.name || region.name');
+            $query->andWhere(['ilike', $expression, '%' . $this->search . '%', false]);
         }
 
 
@@ -179,7 +175,7 @@ class SurveySearch extends Survey
     public function getQuery(): ActiveQuery
     {
         if ($this->_query === null) {
-            $this->_query = Survey::find()
+            $this->_query = Survey::find()->alias('survey')
                 ->leftJoin(City::tableName() . ' as city', 'city.id = survey.city_id')
                 ->leftJoin(Region::tableName() . ' as region', 'region.id = city.region_id');
         }
