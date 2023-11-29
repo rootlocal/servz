@@ -123,6 +123,7 @@ class SurveySearch extends Survey
         }
 
         $query->andFilterWhere([
+            self::tableName() . '.city_id' => $this->city_id,
             self::tableName() . '.gender' => $this->gender,
             self::tableName() . '.rating' => $this->rating,
         ]);
